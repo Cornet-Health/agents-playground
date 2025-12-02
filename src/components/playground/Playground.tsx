@@ -577,7 +577,7 @@ export default function Playground({
 
     try {
       // const basePath = process.env.NODE_ENV === "production" ? "/playground" : "";
-      const response = await fetch("livekit/api/dispatch-agent", {
+      const response = await fetch("api/livekit/dispatch-agent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -576,7 +576,8 @@ export default function Playground({
     };
 
     try {
-      const response = await fetch("/api/dispatch-agent", {
+      const basePath = process.env.NODE_ENV === "production" ? "/playground" : "";
+      const response = await fetch(`${basePath}/api/dispatch-agent`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

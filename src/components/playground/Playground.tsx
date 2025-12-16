@@ -576,8 +576,11 @@ export default function Playground({
     };
 
     try {
-      const basePath = process.env.NODE_ENV === "production" ? "/playground" : "";
-      const response = await fetch(`${basePath}/api/dispatch-agent`, {
+      const normalizedBasePath = (process.env.NEXT_PUBLIC_BASE_PATH || "").replace(/\/$/, "");
+      const apiUrl = normalizedBasePath
+        ? `${normalizedBasePath}/api/dispatch-agent`
+        : "/api/dispatch-agent";
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -590,8 +593,19 @@ export default function Playground({
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        alert(`Failed to initiate SIP call: ${error.error}`);
+        const contentType = response.headers.get("content-type") || "";
+        let message = response.statusText;
+        if (contentType.includes("application/json")) {
+          const error = await response.json();
+          if (typeof error === "object" && error !== null && "error" in error) {
+            message = (error as { error?: string }).error || message;
+          }
+        } else {
+          const text = await response.text();
+          message = text || message;
+        }
+
+        alert(`Failed to initiate SIP call: ${message}`);
         return;
       }
 
